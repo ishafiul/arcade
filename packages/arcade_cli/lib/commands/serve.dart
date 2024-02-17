@@ -85,9 +85,12 @@ class ServeCommand extends Command {
       exit(0);
     });
 
-    ProcessSignal.sigterm.watch().listen((_) async {
-      process?.kill();
-      exit(0);
-    });
+    if (!Platform.isWindows) {
+      ProcessSignal.sigterm.watch().listen((_) async {
+        process?.kill();
+        exit(0);
+      });
+    }
+
   }
 }
