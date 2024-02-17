@@ -28,19 +28,29 @@ Future<void> runServer({
 
   await init();
   validatePreviousRouteHasHandler();
-
-  final server = await HttpServer.bind(
-    InternetAddress.anyIPv6,
-    port,
-  );
-
-  server.listen(handleRequest);
-  Logger.root.log(
-    LogRecord(
-      level: LogLevel.none,
-      message: 'Server running on port $port',
-    ),
-  );
+  HttpServer server;
+  try {
+    server = await HttpServer.bind(
+      InternetAddress.anyIPv6,
+      port,
+    );
+    server.listen(handleRequest);
+    Logger.root.log(
+      LogRecord(
+        level: LogLevel.info,
+        message: 'Server running on port $port',
+      ),
+    );
+  } catch (e) {
+    Logger.root.log(
+      LogRecord(
+        level: LogLevel.error,
+        message: 'Something Already Running on Port $port',
+      ),
+    );
+    await Future.delayed(const Duration(seconds: 5));
+    return;
+  }
 
   setupProcessSignalWatchers(server);
 }
